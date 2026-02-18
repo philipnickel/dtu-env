@@ -40,3 +40,24 @@ dtu-env = "dtu_env.cli:main"
 Homepage = "https://pythonsupport.dtu.dk"
 Repository = "https://github.com/philipnickel/dtu-env"
 "Bug Tracker" = "https://github.com/philipnickel/dtu-env/issues"
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+version_variables = ["src/dtu_env/__init__.py:__version__"]
+commit_parser = "conventional"
+build_command = "pip install build && python -m build"
+
+[tool.semantic_release.commit_parser_options]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf"]
+
+[tool.semantic_release.changelog]
+exclude_commit_patterns = [
+    '''chore(?:\([^)]*?\))?: .+''',
+    '''ci(?:\([^)]*?\))?: .+''',
+    '''refactor(?:\([^)]*?\))?: .+''',
+    '''style(?:\([^)]*?\))?: .+''',
+    '''test(?:\([^)]*?\))?: .+''',
+    '''build\((?!deps\): .+)''',
+    '''Initial [Cc]ommit.*''',
+]
