@@ -1,0 +1,48 @@
+context:
+  version: "0.1.0"
+
+package:
+  name: dtu-env
+  version: ${{ version }}
+
+source:
+  url: https://pypi.org/packages/source/d/dtu-env/dtu_env-${{ version }}.tar.gz
+  sha256: PLACEHOLDER
+
+build:
+  noarch: python
+  script: python -m pip install . -vv --no-deps --no-build-isolation
+  python:
+    entry_points:
+      - dtu-env = dtu_env.cli:main
+
+requirements:
+  host:
+    - python >=3.10
+    - pip
+    - hatchling
+  run:
+    - python >=3.10
+    - textual >=0.80.0
+    - rich >=13.0
+    - pyyaml >=6.0
+    - requests >=2.28.0
+
+tests:
+  - python:
+      imports:
+        - dtu_env
+        - dtu_env.cli
+        - dtu_env.api
+        - dtu_env.tui
+      pip_check: true
+
+about:
+  homepage: https://pythonsupport.dtu.dk
+  license: BSD-3-Clause
+  license_file: LICENSE
+  summary: DTU course environment manager
+  description: |
+    Interactive TUI tool for browsing and installing course-specific
+    conda environments for DTU (Technical University of Denmark) courses.
+  repository: https://github.com/philipnickel/dtu-env
