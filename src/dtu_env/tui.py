@@ -79,12 +79,12 @@ class HomeScreen(Screen):
 
     @work(thread=True)
     def refresh_installed(self) -> None:
-        self.call_from_thread(
+        self.app.call_from_thread(
             self.query_one("#home-status", Static).update,
             "Loading installed environments...",
         )
         installed = get_installed_environments()
-        self.call_from_thread(self._populate_installed, installed)
+        self.app.call_from_thread(self._populate_installed, installed)
 
     def _populate_installed(self, envs: list[str]) -> None:
         lv = self.query_one("#installed-list", ListView)
@@ -214,16 +214,16 @@ class InstallScreen(Screen):
 
     @work(thread=True)
     def fetch_environments(self) -> None:
-        self.call_from_thread(
+        self.app.call_from_thread(
             self.query_one("#install-status", Static).update,
             "Fetching available environments from GitHub...",
         )
         try:
             envs = fetch_all_environments()
             installed = get_installed_environments()
-            self.call_from_thread(self._populate, envs, set(installed))
+            self.app.call_from_thread(self._populate, envs, set(installed))
         except Exception as e:
-            self.call_from_thread(
+            self.app.call_from_thread(
                 self.query_one("#install-status", Static).update,
                 f"[red]Error: {e}[/red]",
             )
@@ -294,7 +294,7 @@ class InstallScreen(Screen):
         failed = 0
 
         for i, env in enumerate(envs, 1):
-            self.call_from_thread(
+            self.app.call_from_thread(
                 self.query_one("#install-status", Static).update,
                 f"[yellow]Installing {env.name} ({i}/{total})...[/yellow]",
             )
@@ -304,17 +304,17 @@ class InstallScreen(Screen):
 
             if success:
                 succeeded += 1
-                self.call_from_thread(self.installed_names.add, env.name)
+                self.app.call_from_thread(self.installed_names.add, env.name)
             else:
                 failed += 1
 
         # Refresh the checkboxes to show newly installed
-        self.call_from_thread(self._render_list, self.environments)
+        self.app.call_from_thread(self._render_list, self.environments)
 
         summary = f"[green]{succeeded} installed[/green]"
         if failed:
             summary += f", [red]{failed} failed[/red]"
-        self.call_from_thread(
+        self.app.call_from_thread(
             self.query_one("#install-status", Static).update,
             f"Done: {summary} | Esc to go back",
         )
