@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.1.0 (2026-02-18)
+
+### Features
+
+- Replace Textual TUI with simple interactive CLI using simple-term-menu
+  ([`7832853`](https://github.com/philipnickel/dtu-env/commit/7832853d82a4423a6803a6f61e83b7ca3da41d65))
+
+
 ## v1.0.1 (2026-02-18)
 
 ### Bug Fixes
