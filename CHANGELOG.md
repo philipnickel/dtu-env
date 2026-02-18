@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.1 (2026-02-18)
+
+### Bug Fixes
+
+- Rename workflow to publish.yml to match PyPI trusted publisher config
+  ([`1161707`](https://github.com/philipnickel/dtu-env/commit/11617079ff6816755f1480aa50efaa90b9b9070b))
+
+
 ## v1.0.0 (2026-02-18)
 
 ### Features
