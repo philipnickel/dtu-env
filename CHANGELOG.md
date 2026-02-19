@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.1.1 (2026-02-19)
+
+### Bug Fixes
+
+- Clean up stale recipe, update README, remove dead code, fix imports
+  ([`adfa071`](https://github.com/philipnickel/dtu-env/commit/adfa071427c830952b0e37e2cf62e4e36fc8565a))
+
+
 ## v1.1.0 (2026-02-18)
 
 ### Features
