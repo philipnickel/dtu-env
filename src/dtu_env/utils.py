@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import shutil
 import subprocess
 
@@ -28,7 +29,6 @@ def get_installed_environments() -> list[str]:
     )
     if result.returncode != 0:
         return []
-    import json
     data = json.loads(result.stdout)
     envs = []
     for env_path in data.get("envs", []):

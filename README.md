@@ -1,6 +1,6 @@
 # dtu-env
 
-DTU course environment manager. Interactive TUI to browse and install conda environments for DTU courses.
+DTU course environment manager. Interactive CLI to browse and install conda environments for DTU courses.
 
 ## Usage
 
@@ -8,12 +8,12 @@ DTU course environment manager. Interactive TUI to browse and install conda envi
 dtu-env
 ```
 
-This launches an interactive terminal interface where you can:
+This launches an interactive terminal where you can:
 
 1. See your currently installed conda environments
 2. Browse available DTU course environments (fetched from GitHub)
-3. Filter/search by course number, name, or semester
-4. Multi-select environments and install them
+3. Select one or more environments to install
+4. Confirm and install them via mamba/conda
 
 ## Install
 
@@ -26,6 +26,11 @@ Or with conda (once available on conda-forge):
 ```bash
 conda install dtu-env
 ```
+
+## Requirements
+
+- Python >= 3.10
+- Miniforge3 (or any conda/mamba installation) on your PATH
 
 ## How it works
 

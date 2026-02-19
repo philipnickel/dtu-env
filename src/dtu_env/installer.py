@@ -6,6 +6,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+import requests
 from rich.console import Console
 
 from dtu_env.config import GITHUB_RAW_URL
@@ -34,7 +35,6 @@ def install_environment(env: CourseEnvironment) -> bool:
     console.print(f"Source: [dim]{url}[/dim]\n")
 
     # Download the YAML to a temp file so conda can read it
-    import requests
     response = requests.get(url, timeout=15)
     response.raise_for_status()
 
