@@ -8,6 +8,7 @@ import subprocess
 import sys
 
 from rich.console import Console
+from rich.prompt import Prompt
 from simple_term_menu import TerminalMenu
 
 from dtu_env import __version__
@@ -24,7 +25,6 @@ MENU_STYLE = {
 
 def _get_installed_environments() -> list[str]:
     """return list of installed conda environment names"""
-    # find conda/mamba executable
     exe = None
     for name in ("mamba", "conda"):
         exe = shutil.which(name)
@@ -58,83 +58,73 @@ def _header():
 
 def _fetch_environments():
     """fetch available environments with a spinner"""
-    with console.status("[bold cyan]Fetching available environments from GitHub..."):
+    with console.status("[bold cyan]Loading available courses..."):
         try:
             envs = fetch_all_environments()
         except Exception as e:
-            console.print(f"\n  [red]Error fetching environments:[/red] {e}")
+            console.print(f"\n  [red]Error loading courses:[/red] {e}")
             return []
     return envs
 
 
-def _pick_year(envs):
-    """let user pick a year, sorted newest first. return year string or None"""
-    years = sorted({e.course_year for e in envs}, reverse=True)
-    if not years:
-        return None
-    options = years + ["Back"]
-    menu = TerminalMenu(options, title="  Select year:", **MENU_STYLE)
-    choice = menu.show()
-    if choice is None or choice == len(years):
-        return None
-    return years[choice]
-
-
-def _pick_semester(envs, year):
-    """let user pick a semester for the given year. return semester string or None"""
-    # collect semesters available for this year
-    semesters = set()
+def _search_courses(envs, query):
+    """filter courses by search query (course number or name)"""
+    query = query.lower()
+    matches = set()
     for e in envs:
-        if e.course_year != year:
-            continue
-        sem = e.course_semester.lower()
-        if "autumn" in sem:
-            semesters.add("Autumn")
-        if "spring" in sem:
-            semesters.add("Spring")
+        if (query in e.course_number.lower() or 
+            query in e.course_full_name.lower()):
+            # use course_number as key for uniqueness
+            matches.add((e.course_number, e.course_full_name))
+    return sorted(matches)
 
-    # stable order: Spring before Autumn
-    ordered = [s for s in ["Spring", "Autumn"] if s in semesters]
-    if not ordered:
+
+def _pick_course(courses):
+    """let user pick a course from search results. return (number, name) or None"""
+    if not courses:
+        console.print("  [dim]No courses found matching your search.[/dim]")
         return None
-    options = ordered + ["Back"]
-    menu = TerminalMenu(options, title=f"  Select semester ({year}):", **MENU_STYLE)
+    
+    # format: "01002 - Mathematics 1b"
+    options = [f"{num} - {name}" for num, name in courses] + ["Back"]
+    menu = TerminalMenu(
+        options,
+        title=f"  Select course ({len(courses)} found):",
+        **MENU_STYLE,
+    )
     choice = menu.show()
-    if choice is None or choice == len(ordered):
+    
+    if choice is None or choice == len(courses):
         return None
-    return ordered[choice]
+    return courses[choice]
 
 
-def _pick_courses(envs, year, semester, installed_names):
-    """let user multi-select courses for year+semester. return list of CourseEnvironments"""
-    # filter: match year, and semester must contain the chosen semester
-    filtered = [
-        e for e in envs
-        if e.course_year == year and semester.lower() in e.course_semester.lower()
-    ]
-    if not filtered:
-        console.print("  [dim]No courses found for this selection.[/dim]")
+def _pick_versions(envs, course_number, installed_names):
+    """let user pick version(s) of a course. return list of CourseEnvironments"""
+    # filter all versions of this course
+    versions = [e for e in envs if e.course_number == course_number]
+    # sort by year (newest first) then semester
+    versions.sort(key=lambda e: (e.course_year, e.course_semester), reverse=True)
+    
+    if not versions:
         return []
-
-    # sort by course number
-    filtered.sort(key=lambda e: e.course_number)
-
-    # build menu entries: "01002 - Mathematics 1b"  or  "01002 - Mathematics 1b (installed)"
+    
+    # format: "2025 Spring" or "2024 Autumn (installed)"
     entries = []
     preselected = []
-    for i, env in enumerate(filtered):
+    for i, env in enumerate(versions):
         tag = " (installed)" if env.name in installed_names else ""
-        entries.append(f"{env.course_number} - {env.course_full_name}{tag}")
+        entries.append(f"{env.course_year} {env.course_semester}{tag}")
         if env.name in installed_names:
             preselected.append(i)
-
-    console.print(f"  [dim]{len(filtered)} courses available for {semester} {year}[/dim]")
+    
+    console.print(f"  [dim]{len(versions)} version(s) available[/dim]")
     console.print(f"  [dim]space=toggle  enter=confirm  q/esc=back[/dim]")
     console.print()
-
+    
     menu = TerminalMenu(
         entries,
-        title=f"  Select courses ({semester} {year}):",
+        title=f"  Select version(s) to install:",
         multi_select=True,
         show_multi_select_hint=True,
         multi_select_select_on_accept=False,
@@ -143,19 +133,19 @@ def _pick_courses(envs, year, semester, installed_names):
         **MENU_STYLE,
     )
     chosen = menu.show()
-
+    
     if chosen is None:
         return []
     if isinstance(chosen, int):
         chosen = (chosen,)
-
+    
     # filter out already-installed
     selected = []
     for idx in chosen:
-        env = filtered[idx]
+        env = versions[idx]
         if env.name not in installed_names:
             selected.append(env)
-
+    
     return selected
 
 
@@ -212,7 +202,7 @@ def run_tui():
                 console.print("  [dim]Bye![/dim]")
                 break
 
-            # fetch all environments once
+            # load all environments
             console.print()
             envs = _fetch_environments()
             if not envs:
@@ -220,25 +210,28 @@ def run_tui():
                 input()
                 continue
 
+            # search for course
+            console.print()
+            query = Prompt.ask("  Search for course (number or name)", default="")
+            if not query:
+                continue
+                
+            courses = _search_courses(envs, query)
+            course = _pick_course(courses)
+            if course is None:
+                continue
+            
+            # select versions
             installed_names = set(installed)
-
-            # drill-down: year -> semester -> courses
-            year = _pick_year(envs)
-            if year is None:
-                continue
-
-            semester = _pick_semester(envs, year)
-            if semester is None:
-                continue
-
-            selected = _pick_courses(envs, year, semester, installed_names)
+            selected = _pick_versions(envs, course[0], installed_names)
+            
             if not selected:
                 console.print("\n  [dim]Nothing to install.[/dim]")
                 console.print("  [dim]Press enter to continue...[/dim]")
                 input()
                 continue
 
-            # confirm
+            # confirm and install
             console.print()
             names = ", ".join(e.name for e in selected)
             console.print(f"  Will install: [bold cyan]{names}[/bold cyan]")
