@@ -8,6 +8,7 @@ import subprocess
 import sys
 
 from rich.console import Console
+from rich.prompt import Prompt
 from simple_term_menu import TerminalMenu
 
 from dtu_env import __version__
@@ -155,17 +156,84 @@ def _pick_versions(envs, course_number, installed_names):
     return selected
 
 
-def _install_selected(selected):
-    """install the selected environments one by one"""
-    total = len(selected)
+def _validate_env_name(name: str) -> tuple[bool, str]:
+    """validate env name. returns (is_valid, error_message)."""
+    if not name.strip():
+        return False, "Name cannot be empty"
+    if " " in name:
+        return False, "Name cannot contain spaces"
+    return True, ""
+
+
+def _rename_environments(envs):
+    """prompt for rename with validation. returns list of (env, new_name)."""
+    renamed = []
+    for env in envs:
+        while True:
+            # show: "Rename environment 01001_A24 (01001 - Mathematics 1a)?"
+            prompt_text = f"Rename environment [bold]{env.name}[/bold] ({env.course_number} - {env.course_full_name})?"
+            console.print(f"\n  {prompt_text}")
+
+            new_name = Prompt.ask(
+                "  New name",
+                default=env.name,
+                show_default=False,
+            )
+
+            # if empty (just Enter), use original name
+            if not new_name.strip():
+                final_name = env.name
+                renamed.append((env, final_name))
+                break
+
+            is_valid, error = _validate_env_name(new_name)
+            if is_valid:
+                renamed.append((env, new_name))
+                break
+            else:
+                console.print(f"  [red]Error: {error}[/red]")
+                console.print("  [dim]Please try again[/dim]")
+
+    return renamed
+
+
+def _show_install_summary(renamed_envs):
+    """show proceed confirmation with renamed environments."""
+    console.print()
+    console.print("  Will install:")
+    for env, new_name in renamed_envs:
+        if new_name != env.name:
+            console.print(f"    [bold cyan]{new_name}[/bold cyan] [dim](was: {env.name})[/dim]")
+        else:
+            console.print(f"    [bold cyan]{env.name}[/bold cyan] [dim](unchanged)[/dim]")
+    console.print()
+
+    confirm_menu = TerminalMenu(
+        ["Yes, install", "Cancel"],
+        title="  Proceed?",
+        **MENU_STYLE,
+    )
+    return confirm_menu.show() == 0
+
+
+def _install_selected(renamed_envs):
+    """install the selected environments one by one with potential new names."""
+    total = len(renamed_envs)
     succeeded = 0
     failed = 0
 
-    for i, env in enumerate(selected, 1):
+    for i, (env, new_name) in enumerate(renamed_envs, 1):
         console.print()
-        console.rule(f"[bold cyan]Installing {env.name} ({i}/{total})[/bold cyan]")
+        if new_name != env.name:
+            console.rule(f"[bold cyan]Installing {new_name} ({i}/{total})[/bold cyan] [dim](from {env.name})[/dim]")
+        else:
+            console.rule(f"[bold cyan]Installing {env.name} ({i}/{total})[/bold cyan]")
+
         try:
-            install_environment(env)
+            # create modified env object with new name for installer
+            from dataclasses import replace
+            env_to_install = replace(env, name=new_name)
+            install_environment(env_to_install)
             succeeded += 1
         except Exception as e:
             console.print(f"\n[red]Error:[/red] {e}")
@@ -232,19 +300,16 @@ def run_tui():
                 input()
                 continue
 
-            # confirm and install
+            # rename environments
             console.print()
-            names = ", ".join(e.name for e in selected)
-            console.print(f"  Will install: [bold cyan]{names}[/bold cyan]")
-            confirm_menu = TerminalMenu(
-                ["Yes, install", "Cancel"],
-                title="  Proceed?",
-                **MENU_STYLE,
-            )
-            if confirm_menu.show() != 0:
+            console.print("  [dim]Press Enter to keep current name, or type a new name (no spaces)[/dim]")
+            renamed = _rename_environments(selected)
+            
+            # confirm and install
+            if not _show_install_summary(renamed):
                 continue
 
-            _install_selected(selected)
+            _install_selected(renamed)
             console.print("  [dim]Press enter to continue...[/dim]")
             input()
     except KeyboardInterrupt:
