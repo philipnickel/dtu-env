@@ -36,11 +36,17 @@ def install_environment(env: CourseEnvironment) -> None:
                   f"({env.course_full_name})...")
     console.print(f"Using: [dim]{Path(exe).stem}[/dim]")
 
-    # Read bundled YAML file
+    # Read bundled YAML file and modify the name field
     yaml_path = files("dtu_env").joinpath("environments").joinpath(env.filename)
     yaml_content = yaml_path.read_text()
 
-    # Write to temp file for conda to read
+    # Replace the name field with the (potentially) renamed environment name
+    # The YAML has: name: 01001_A24
+    # We need to change it to: name: <env.name>
+    import re
+    yaml_content = re.sub(r'^name:\s*\S+', f'name: {env.name}', yaml_content, flags=re.MULTILINE)
+
+    # Write modified YAML to temp file for conda to read
     with tempfile.NamedTemporaryFile(
         mode="w", suffix=".yml", delete=False, prefix=f"dtu-env-{env.name}-"
     ) as f:
