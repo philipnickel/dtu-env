@@ -1,0 +1,47 @@
+name: Update Environment Metadata
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Daily at 00:00 UTC
+  workflow_dispatch:  # Allow manual trigger
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/update_environments.py'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      
+      - name: Setup uv
+        uses: astral-sh/setup-uv@38f3f104447c67c051c4a08c39e64d0f17c7760 # v5.4.2
+        with:
+          version: "latest"
+      
+      - name: Update environments
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: uv run scripts/update_environments.py
+      
+      - name: Check for changes
+        id: check
+        run: |
+          if git diff --quiet src/dtu_env/environments.json src/dtu_env/environments/; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/dtu_env/environments.json src/dtu_env/environments/
+          git commit -m "chore: update bundled environments [skip ci]"
+          git push
