@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       
       - name: Setup uv
-        uses: astral-sh/setup-uv@38f3f104447c67c051c4a08c39e64d0f17c7760 # v5.4.2
+        uses: astral-sh/setup-uv@v5
         with:
           version: "latest"
       
