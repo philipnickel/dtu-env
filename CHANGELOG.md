@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.4.0 (2026-02-20)
+
+### Bug Fixes
+
+- Actually use renamed environment name in YAML
+  ([`c0fb918`](https://github.com/philipnickel/dtu-env/commit/c0fb918ed2bd30525c4a7ffca564099230e4b4a0))
+
+### Features
+
+- Add environment renaming with validation
+  ([`287bac4`](https://github.com/philipnickel/dtu-env/commit/287bac477994b1b771909a131183eae5dd103582))
+
+
 ## v1.3.0 (2026-02-20)
 
 ### Features
