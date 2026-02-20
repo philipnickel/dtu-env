@@ -2,6 +2,45 @@
 
 <!-- version list -->
 
+## v1.4.1 (2026-02-20)
+
+### Bug Fixes
+
+- Add requests to dev dependencies for update script
+  ([`755b5c4`](https://github.com/philipnickel/dtu-env/commit/755b5c4f9a2256da78b67768bef4908ec02b06c5))
+
+- Configure semantic-release to bump on chore commits
+  ([`9051581`](https://github.com/philipnickel/dtu-env/commit/90515814003e566f44045a13504ddcefc0154752))
+
+- Remove [skip ci] so release workflow runs on environment updates
+  ([`b665ad0`](https://github.com/philipnickel/dtu-env/commit/b665ad0544601bca9bf918e9eb339ceffc3b0590))
+
+### Chores
+
+- Remove 10060_25 to test update workflow
+  ([`3447009`](https://github.com/philipnickel/dtu-env/commit/3447009759a3f4fc733eec71dd105d4ff08fa8c0))
+
+- Update bundled environments
+  ([`a7075f9`](https://github.com/philipnickel/dtu-env/commit/a7075f9be16a335b669a261d6c7fc2831ab971a8))
+
+- Update bundled environments
+  ([`62e6bf6`](https://github.com/philipnickel/dtu-env/commit/62e6bf6057438f3863421120696175cc4d7c00a4))
+
+- Update bundled environments
+  ([`ed6a01e`](https://github.com/philipnickel/dtu-env/commit/ed6a01edab76268416025a6256cb027acf4d6714))
+
+- Update bundled environments [skip ci]
+  ([`287e0f3`](https://github.com/philipnickel/dtu-env/commit/287e0f3292aaafd88e4601845efe30e5b9c1dea3))
+
+- Update uv.lock with requests dev dep
+  ([`d996b52`](https://github.com/philipnickel/dtu-env/commit/d996b52a9bfbac061d919a61012ced51c012d6a8))
+
+### Testing
+
+- Remove 01001_A24 to test update workflow
+  ([`68ecaf0`](https://github.com/philipnickel/dtu-env/commit/68ecaf02c110e029f510e42407a179abee1c5eaf))
+
+
 ## v1.4.0 (2026-02-20)
 
 ### Bug Fixes
