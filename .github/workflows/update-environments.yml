@@ -43,5 +43,5 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
           git add src/dtu_env/environments.json src/dtu_env/environments/
-          git commit -m "chore: update bundled environments [skip ci]"
+          git commit -m "chore: update bundled environments"
           git push
