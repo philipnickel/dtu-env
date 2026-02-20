@@ -8,7 +8,6 @@ import subprocess
 import sys
 
 from rich.console import Console
-from rich.prompt import Prompt
 from simple_term_menu import TerminalMenu
 
 from dtu_env import __version__
@@ -67,29 +66,36 @@ def _fetch_environments():
     return envs
 
 
-def _search_courses(envs, query):
-    """filter courses by search query (course number or name)"""
-    query = query.lower()
-    matches = set()
+def _get_unique_courses(envs):
+    """get list of unique courses (number, name) tuples"""
+    seen = set()
+    courses = []
     for e in envs:
-        if (query in e.course_number.lower() or 
-            query in e.course_full_name.lower()):
-            # use course_number as key for uniqueness
-            matches.add((e.course_number, e.course_full_name))
-    return sorted(matches)
+        key = (e.course_number, e.course_full_name)
+        if key not in seen:
+            seen.add(key)
+            courses.append(key)
+    return sorted(courses)
 
 
 def _pick_course(courses):
-    """let user pick a course from search results. return (number, name) or None"""
+    """let user pick a course from list with live search. return (number, name) or None"""
     if not courses:
-        console.print("  [dim]No courses found matching your search.[/dim]")
+        console.print("  [dim]No courses available.[/dim]")
         return None
     
     # format: "01002 - Mathematics 1b"
     options = [f"{num} - {name}" for num, name in courses] + ["Back"]
+    
+    console.print(f"  [dim]Start typing to search ({len(courses)} courses)[/dim]")
+    console.print(f"  [dim]e.g., type '01002' or 'math' to filter[/dim]")
+    console.print()
+    
     menu = TerminalMenu(
         options,
-        title=f"  Select course ({len(courses)} found):",
+        title="  Select course:",
+        search_key=None,  # enables live search with any key
+        show_search_hint=True,
         **MENU_STYLE,
     )
     choice = menu.show()
@@ -124,7 +130,7 @@ def _pick_versions(envs, course_number, installed_names):
     
     menu = TerminalMenu(
         entries,
-        title=f"  Select version(s) to install:",
+        title="  Select version(s) to install:",
         multi_select=True,
         show_multi_select_hint=True,
         multi_select_select_on_accept=False,
@@ -210,13 +216,8 @@ def run_tui():
                 input()
                 continue
 
-            # search for course
-            console.print()
-            query = Prompt.ask("  Search for course (number or name)", default="")
-            if not query:
-                continue
-                
-            courses = _search_courses(envs, query)
+            # get unique courses and pick one
+            courses = _get_unique_courses(envs)
             course = _pick_course(courses)
             if course is None:
                 continue
