@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-02-20T07:32:54.542747+00:00",
+  "generated_at": "2026-02-20T10:53:39.492994+00:00",
   "environments": [
     {
       "name": "01001_A24",
@@ -7,17 +7,7 @@
       "course_full_name": "Mathematics 1a",
       "course_year": "2024",
       "course_semester": "Autumn",
-      "filename": "01001_A24.yml",
-      "channels": [
-        "conda-forge"
-      ],
-      "dependencies": [
-        "python=3.11",
-        "jupyter",
-        "dtumathtools",
-        "pandas",
-        "scipy"
-      ]
+      "filename": "01001_A24.yml"
     },
     {
       "name": "01001_A25",
@@ -25,17 +15,7 @@
       "course_full_name": "Mathematics 1a",
       "course_year": "2025",
       "course_semester": "Autumn",
-      "filename": "01001_A25.yml",
-      "channels": [
-        "conda-forge"
-      ],
-      "dependencies": [
-        "python=3.11",
-        "jupyter",
-        "dtumathtools",
-        "pandas",
-        "scipy"
-      ]
+      "filename": "01001_A25.yml"
     },
     {
       "name": "01002_S24",
@@ -43,17 +23,7 @@
       "course_full_name": "Mathematics 1b",
       "course_year": "2024",
       "course_semester": "Spring",
-      "filename": "01002_S24.yml",
-      "channels": [
-        "conda-forge"
-      ],
-      "dependencies": [
-        "python=3.11",
-        "jupyter",
-        "dtumathtools",
-        "pandas",
-        "scipy"
-      ]
+      "filename": "01002_S24.yml"
     },
     {
       "name": "01002_S25",
@@ -61,17 +31,7 @@
       "course_full_name": "Mathematics 1b",
       "course_year": "2025",
       "course_semester": "Spring",
-      "filename": "01002_S25.yml",
-      "channels": [
-        "conda-forge"
-      ],
-      "dependencies": [
-        "python=3.11",
-        "jupyter",
-        "dtumathtools",
-        "pandas",
-        "scipy"
-      ]
+      "filename": "01002_S25.yml"
     },
     {
       "name": "01002_S26",
@@ -79,17 +39,7 @@
       "course_full_name": "Mathematics 1b",
       "course_year": "2026",
       "course_semester": "Spring",
-      "filename": "01002_S26.yml",
-      "channels": [
-        "conda-forge"
-      ],
-      "dependencies": [
-        "python=3.11",
-        "jupyter",
-        "dtumathtools",
-        "pandas",
-        "scipy"
-      ]
+      "filename": "01002_S26.yml"
     },
     {
       "name": "02002_A24",
@@ -97,15 +47,7 @@
       "course_full_name": "Computer Programming",
       "course_year": "2024",
       "course_semester": "Autumn",
-      "filename": "02002_A24.yml",
-      "channels": [
-        "conda-forge"
-      ],
-      "dependencies": [
-        "python=3.11",
-        "numpy",
-        "matplotlib"
-      ]
+      "filename": "02002_A24.yml"
     },
     {
       "name": "02002_A25",
@@ -113,15 +55,7 @@
       "course_full_name": "Computer Programming",
       "course_year": "2025",
       "course_semester": "Autumn",
-      "filename": "02002_A25.yml",
-      "channels": [
-        "conda-forge"
-      ],
-      "dependencies": [
-        "python=3.11",
-        "numpy",
-        "matplotlib"
-      ]
+      "filename": "02002_A25.yml"
     },
     {
       "name": "02402_A24",
@@ -129,17 +63,7 @@
       "course_full_name": "Statistic",
       "course_year": "2024",
       "course_semester": "Autumn",
-      "filename": "02402_A24.yml",
-      "channels": [
-        "conda-forge"
-      ],
-      "dependencies": [
-        "python=3.11",
-        "jupyter",
-        "pandas",
-        "statsmodels",
-        "scipy"
-      ]
+      "filename": "02402_A24.yml"
     },
     {
       "name": "02402_A25",
@@ -147,17 +71,7 @@
       "course_full_name": "Statistic",
       "course_year": "2025",
       "course_semester": "Autumn",
-      "filename": "02402_A25.yml",
-      "channels": [
-        "conda-forge"
-      ],
-      "dependencies": [
-        "python=3.11",
-        "jupyter",
-        "pandas",
-        "statsmodels",
-        "scipy"
-      ]
+      "filename": "02402_A25.yml"
     },
     {
       "name": "02402_S25",
@@ -165,17 +79,7 @@
       "course_full_name": "Statistic",
       "course_year": "2025",
       "course_semester": "Spring",
-      "filename": "02402_S25.yml",
-      "channels": [
-        "conda-forge"
-      ],
-      "dependencies": [
-        "python=3.11",
-        "jupyter",
-        "pandas",
-        "statsmodels",
-        "scipy"
-      ]
+      "filename": "02402_S25.yml"
     },
     {
       "name": "02461_A24",
@@ -183,28 +87,7 @@
       "course_full_name": "Introduction to Intelligent Systems",
       "course_year": "2024",
       "course_semester": "Autumn",
-      "filename": "02461_A24.yml",
-      "channels": [
-        "pytorch",
-        "conda-forge"
-      ],
-      "dependencies": [
-        "python=3.11",
-        "pytorch",
-        "torchvision",
-        "torchaudio",
-        "matplotlib",
-        "opencv",
-        "imageio",
-        "scikit-learn",
-        "scikit-image",
-        "jupyter",
-        "pygame",
-        "scipy",
-        "nltk",
-        "ipywidgets",
-        "tqdm"
-      ]
+      "filename": "02461_A24.yml"
     },
     {
       "name": "02461_A25",
@@ -212,28 +95,7 @@
       "course_full_name": "Introduction to Intelligent Systems",
       "course_year": "2025",
       "course_semester": "Autumn",
-      "filename": "02461_A25.yml",
-      "channels": [
-        "pytorch",
-        "conda-forge"
-      ],
-      "dependencies": [
-        "python=3.11",
-        "pytorch",
-        "torchvision",
-        "torchaudio",
-        "matplotlib",
-        "opencv",
-        "imageio",
-        "scikit-learn",
-        "scikit-image",
-        "jupyter",
-        "pygame",
-        "scipy",
-        "nltk",
-        "ipywidgets",
-        "tqdm"
-      ]
+      "filename": "02461_A25.yml"
     },
     {
       "name": "10060_24",
@@ -241,19 +103,7 @@
       "course_full_name": "Physics",
       "course_year": "2024",
       "course_semester": "Spring & Autumn",
-      "filename": "10060_24.yml",
-      "channels": [
-        "conda-forge"
-      ],
-      "dependencies": [
-        "python=3.11",
-        "jupyter",
-        "numpy",
-        "uncertainties",
-        "scipy",
-        "matplotlib",
-        "pandas"
-      ]
+      "filename": "10060_24.yml"
     },
     {
       "name": "10060_25",
@@ -261,19 +111,7 @@
       "course_full_name": "Physics",
       "course_year": "2025",
       "course_semester": "Spring & Autumn",
-      "filename": "10060_25.yml",
-      "channels": [
-        "conda-forge"
-      ],
-      "dependencies": [
-        "python=3.11",
-        "jupyter",
-        "numpy",
-        "uncertainties",
-        "scipy",
-        "matplotlib",
-        "pandas"
-      ]
+      "filename": "10060_25.yml"
     }
   ]
 }

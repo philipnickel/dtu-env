@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fetch environment metadata from GitHub and update bundled JSON."""
+"""Fetch environment YAML files from GitHub and bundle them."""
 
 import json
 import os
@@ -32,12 +32,12 @@ def fetch_filenames() -> list[str]:
     )
 
 
-def fetch_yaml(filename: str) -> dict:
-    """Fetch and parse a single YAML file."""
+def fetch_yaml(filename: str) -> str:
+    """Fetch raw YAML file content."""
     url = f"{GITHUB_RAW_URL}/{filename}"
     response = requests.get(url, timeout=15)
     response.raise_for_status()
-    return yaml.safe_load(response.text)
+    return response.text
 
 
 def main():
@@ -45,10 +45,22 @@ def main():
     filenames = fetch_filenames()
     print(f"Found {len(filenames)} environments")
     
+    # Create environments directory
+    env_dir = Path(__file__).parent.parent / "src" / "dtu_env" / "environments"
+    env_dir.mkdir(parents=True, exist_ok=True)
+    
     environments = []
     for filename in filenames:
         print(f"  Processing {filename}...")
-        data = fetch_yaml(filename)
+        
+        # Fetch and save YAML file
+        yaml_content = fetch_yaml(filename)
+        yaml_path = env_dir / filename
+        with open(yaml_path, "w") as f:
+            f.write(yaml_content)
+        
+        # Parse for metadata
+        data = yaml.safe_load(yaml_content)
         meta = data.get("metadata", {})
         
         environments.append({
@@ -58,21 +70,20 @@ def main():
             "course_year": meta.get("course_year", ""),
             "course_semester": meta.get("course_semester", ""),
             "filename": filename,
-            "channels": data.get("channels", []),
-            "dependencies": data.get("dependencies", []),
         })
     
+    # Write metadata JSON
     output = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "environments": environments,
     }
     
-    # Write to src/dtu_env/environments.json
-    output_file = Path(__file__).parent.parent / "src" / "dtu_env" / "environments.json"
-    with open(output_file, "w") as f:
+    json_path = Path(__file__).parent.parent / "src" / "dtu_env" / "environments.json"
+    with open(json_path, "w") as f:
         json.dump(output, f, indent=2)
     
-    print(f"\nWrote {len(environments)} environments to {output_file}")
+    print(f"\nWrote {len(environments)} YAML files to {env_dir}")
+    print(f"Wrote metadata to {json_path}")
 
 
 if __name__ == "__main__":
