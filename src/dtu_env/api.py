@@ -20,10 +20,28 @@ def _api_headers() -> dict[str, str]:
     return headers
 
 
+def _handle_rate_limit(response) -> None:
+    """check if response is rate limited and raise helpful error"""
+    if response.status_code == 403:
+        # Check if it's a rate limit (vs other 403)
+        try:
+            data = response.json()
+            if "rate limit" in data.get("message", "").lower():
+                raise RuntimeError(
+                    "GitHub API rate limit exceeded (60 requests/hour). "
+                    "Set GITHUB_TOKEN environment variable for 5000 requests/hour."
+                )
+        except (ValueError, AttributeError):
+            pass
+
+
 def fetch_environment_list() -> list[str]:
     """fetch the list of .yml filenames from the GitHub environments directory"""
     response = requests.get(GITHUB_API_URL, headers=_api_headers(), timeout=15)
+    
+    _handle_rate_limit(response)
     response.raise_for_status()
+    
     entries = response.json()
     return sorted(
         entry["name"]
