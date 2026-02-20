@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.2.0 (2026-02-20)
+
+### Features
+
+- Add drill-down year/semester/course selection + better rate limit handling
+  ([`dbd6694`](https://github.com/philipnickel/dtu-env/commit/dbd66945ffb5e992cd00e9c08feead2d44b5179c))
+
+
 ## v1.1.1 (2026-02-19)
 
 ### Bug Fixes
