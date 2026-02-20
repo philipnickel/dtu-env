@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import json
+import shutil
+import subprocess
 import sys
 
 from rich.console import Console
@@ -10,9 +13,35 @@ from simple_term_menu import TerminalMenu
 from dtu_env import __version__
 from dtu_env.api import fetch_all_environments
 from dtu_env.installer import install_environment
-from dtu_env.utils import get_installed_environments
 
 console = Console()
+
+
+def _get_installed_environments() -> list[str]:
+    """return list of installed conda environment names"""
+    # find conda/mamba executable
+    exe = None
+    for name in ("mamba", "conda"):
+        exe = shutil.which(name)
+        if exe:
+            break
+    if not exe:
+        return []
+    result = subprocess.run(
+        [exe, "env", "list", "--json"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return []
+    data = json.loads(result.stdout)
+    envs = []
+    for env_path in data.get("envs", []):
+        name = env_path.rsplit("/", 1)[-1].rsplit("\\", 1)[-1]
+        envs.append(name)
+    return envs
+
 
 MENU_STYLE = {
     "menu_cursor_style": ("fg_cyan", "bold"),
@@ -173,7 +202,7 @@ def _run_loop():
         console.clear()
         _header()
 
-        installed = get_installed_environments()
+        installed = _get_installed_environments()
         if installed:
             console.print("  [bold]Installed conda environments:[/bold]")
             console.print()

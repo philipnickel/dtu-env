@@ -3,13 +3,28 @@
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass, field
 from importlib.resources import files
 
-import requests
-import yaml
 
-from dtu_env.config import GITHUB_RAW_URL
-from dtu_env.models import CourseEnvironment
+GITHUB_RAW_URL = (
+    "https://raw.githubusercontent.com/dtudk/pythonsupport-page"
+    "/main/docs/_static/environments"
+)
+
+
+@dataclass
+class CourseEnvironment:
+    """a single course environment parsed from a YAML file"""
+
+    name: str
+    course_number: str
+    course_full_name: str
+    course_year: str
+    course_semester: str
+    channels: list[str] = field(default_factory=list)
+    dependencies: list[str] = field(default_factory=list)
+    filename: str = ""
 
 
 def _load_environments_json() -> dict:
@@ -34,11 +49,3 @@ def fetch_all_environments() -> list[CourseEnvironment]:
         )
         for e in data["environments"]
     ]
-
-
-def fetch_environment_yaml(filename: str) -> dict:
-    """Fetch a single YAML from raw GitHub (no API, no rate limit)."""
-    url = f"{GITHUB_RAW_URL}/{filename}"
-    response = requests.get(url, timeout=15)
-    response.raise_for_status()
-    return yaml.safe_load(response.text)

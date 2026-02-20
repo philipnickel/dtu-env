@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shutil
 import subprocess
 import tempfile
 from pathlib import Path
@@ -9,16 +10,29 @@ from pathlib import Path
 import requests
 from rich.console import Console
 
-from dtu_env.config import GITHUB_RAW_URL
-from dtu_env.models import CourseEnvironment
-from dtu_env.utils import find_conda_executable
+from dtu_env.api import CourseEnvironment
+
 
 console = Console()
+
+GITHUB_RAW_URL = (
+    "https://raw.githubusercontent.com/dtudk/pythonsupport-page"
+    "/main/docs/_static/environments"
+)
+
+
+def _find_conda_executable() -> str | None:
+    """find mamba or conda executable, preferring mamba"""
+    for name in ("mamba", "conda"):
+        path = shutil.which(name)
+        if path:
+            return path
+    return None
 
 
 def install_environment(env: CourseEnvironment) -> bool:
     """install a course environment using mamba/conda"""
-    exe = find_conda_executable()
+    exe = _find_conda_executable()
     if not exe:
         console.print(
             "[red]Error:[/red] No conda or mamba executable found. "
