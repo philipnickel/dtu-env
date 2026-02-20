@@ -6,11 +6,7 @@ GITHUB_REPO = "pythonsupport-page"
 GITHUB_BRANCH = "main"
 GITHUB_ENV_DIR = "docs/_static/environments"
 
-# Constructed URLs
-GITHUB_API_URL = (
-    f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}"
-    f"/contents/{GITHUB_ENV_DIR}?ref={GITHUB_BRANCH}"
-)
+# Raw URL for fetching YAML files (no API, no rate limits)
 GITHUB_RAW_URL = (
     f"https://raw.githubusercontent.com/{GITHUB_USER}/{GITHUB_REPO}"
     f"/{GITHUB_BRANCH}/{GITHUB_ENV_DIR}"

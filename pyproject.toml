@@ -1,6 +1,6 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["uv_build>=0.6.0,<0.7.0"]
+build-backend = "uv_build"
 
 [project]
 name = "dtu-env"
@@ -61,3 +61,6 @@ exclude_commit_patterns = [
     '''build\((?!deps\): .+)''',
     '''Initial [Cc]ommit.*''',
 ]
+
+[tool.uv.build-backend]
+source-include = ["src/dtu_env/data/**"]
