@@ -168,10 +168,11 @@ def _install_selected(selected):
     for i, env in enumerate(selected, 1):
         console.print()
         console.rule(f"[bold cyan]Installing {env.name} ({i}/{total})[/bold cyan]")
-        success = install_environment(env)
-        if success:
+        try:
+            install_environment(env)
             succeeded += 1
-        else:
+        except Exception as e:
+            console.print(f"\n[red]Error:[/red] {e}")
             failed += 1
 
     console.print()

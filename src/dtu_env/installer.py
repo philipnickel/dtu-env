@@ -21,31 +21,26 @@ GITHUB_RAW_URL = (
 )
 
 
-def _find_conda_executable() -> str | None:
+def _find_conda_executable() -> str:
     """find mamba or conda executable, preferring mamba"""
     for name in ("mamba", "conda"):
         path = shutil.which(name)
         if path:
             return path
-    return None
+    raise RuntimeError(
+        "No conda or mamba executable found. "
+        "Is Miniforge3 installed and on your PATH?"
+    )
 
 
-def install_environment(env: CourseEnvironment) -> bool:
+def install_environment(env: CourseEnvironment) -> None:
     """install a course environment using mamba/conda"""
     exe = _find_conda_executable()
-    if not exe:
-        console.print(
-            "[red]Error:[/red] No conda or mamba executable found. "
-            "Is Miniforge3 installed and on your PATH?"
-        )
-        return False
-
-    exe_name = Path(exe).stem
     url = f"{GITHUB_RAW_URL}/{env.filename}"
 
     console.print(f"\nInstalling [bold cyan]{env.name}[/bold cyan] "
                   f"({env.course_full_name})...")
-    console.print(f"Using: [dim]{exe_name}[/dim]")
+    console.print(f"Using: [dim]{Path(exe).stem}[/dim]")
     console.print(f"Source: [dim]{url}[/dim]\n")
 
     # Download the YAML to a temp file so conda can read it
@@ -61,21 +56,10 @@ def install_environment(env: CourseEnvironment) -> bool:
     try:
         cmd = [exe, "env", "create", "-f", tmp_path, "--yes"]
         console.print(f"Running: [dim]{' '.join(cmd)}[/dim]\n")
-
-        result = subprocess.run(
-            cmd,
-            text=True,
-            check=False,
+        subprocess.run(cmd, check=True)
+        console.print(
+            f"\n[green]Success![/green] Environment [bold]{env.name}[/bold] installed."
         )
-
-        if result.returncode == 0:
-            console.print(
-                f"\n[green]Success![/green] Environment [bold]{env.name}[/bold] installed."
-            )
-            console.print(f"Activate it with: [bold cyan]conda activate {env.name}[/bold cyan]")
-            return True
-        else:
-            console.print(f"\n[red]Error:[/red] Environment creation failed (exit code {result.returncode}).")
-            return False
+        console.print(f"Activate it with: [bold cyan]conda activate {env.name}[/bold cyan]")
     finally:
         Path(tmp_path).unlink(missing_ok=True)
