@@ -16,6 +16,11 @@ from dtu_env.installer import install_environment
 
 console = Console()
 
+MENU_STYLE = {
+    "menu_cursor_style": ("fg_cyan", "bold"),
+    "menu_highlight_style": ("fg_cyan", "bold"),
+}
+
 
 def _get_installed_environments() -> list[str]:
     """return list of installed conda environment names"""
@@ -43,18 +48,6 @@ def _get_installed_environments() -> list[str]:
     return envs
 
 
-MENU_STYLE = {
-    "menu_cursor_style": ("fg_cyan", "bold"),
-    "menu_highlight_style": ("fg_cyan", "bold"),
-}
-
-
-def _menu(options, title, **kwargs):
-    """create and show a TerminalMenu, return selected index or None"""
-    menu = TerminalMenu(options, title=title, **MENU_STYLE, **kwargs)
-    return menu.show()
-
-
 def _header():
     """print the app header"""
     console.print()
@@ -80,7 +73,8 @@ def _pick_year(envs):
     if not years:
         return None
     options = years + ["Back"]
-    choice = _menu(options, "  Select year:")
+    menu = TerminalMenu(options, title="  Select year:", **MENU_STYLE)
+    choice = menu.show()
     if choice is None or choice == len(years):
         return None
     return years[choice]
@@ -104,7 +98,8 @@ def _pick_semester(envs, year):
     if not ordered:
         return None
     options = ordered + ["Back"]
-    choice = _menu(options, f"  Select semester ({year}):")
+    menu = TerminalMenu(options, title=f"  Select semester ({year}):", **MENU_STYLE)
+    choice = menu.show()
     if choice is None or choice == len(ordered):
         return None
     return ordered[choice]
@@ -190,71 +185,73 @@ def _install_selected(selected):
 def run_tui():
     """launch the interactive environment manager"""
     try:
-        _run_loop()
+        while True:
+            console.clear()
+            _header()
+
+            installed = _get_installed_environments()
+            if installed:
+                console.print("  [bold]Installed conda environments:[/bold]")
+                console.print()
+                for name in installed:
+                    console.print(f"    {name}")
+            else:
+                console.print("  [dim]No conda environments found.[/dim]")
+            console.print()
+
+            menu = TerminalMenu(
+                ["Install additional environments", "Quit"],
+                title="  What would you like to do?",
+                **MENU_STYLE,
+            )
+            choice = menu.show()
+
+            if choice != 0:
+                console.print()
+                console.print("  [dim]Bye![/dim]")
+                break
+
+            # fetch all environments once
+            console.print()
+            envs = _fetch_environments()
+            if not envs:
+                console.print("  [dim]No environments available. Press enter to continue...[/dim]")
+                input()
+                continue
+
+            installed_names = set(installed)
+
+            # drill-down: year -> semester -> courses
+            year = _pick_year(envs)
+            if year is None:
+                continue
+
+            semester = _pick_semester(envs, year)
+            if semester is None:
+                continue
+
+            selected = _pick_courses(envs, year, semester, installed_names)
+            if not selected:
+                console.print("\n  [dim]Nothing to install.[/dim]")
+                console.print("  [dim]Press enter to continue...[/dim]")
+                input()
+                continue
+
+            # confirm
+            console.print()
+            names = ", ".join(e.name for e in selected)
+            console.print(f"  Will install: [bold cyan]{names}[/bold cyan]")
+            confirm_menu = TerminalMenu(
+                ["Yes, install", "Cancel"],
+                title="  Proceed?",
+                **MENU_STYLE,
+            )
+            if confirm_menu.show() != 0:
+                continue
+
+            _install_selected(selected)
+            console.print("  [dim]Press enter to continue...[/dim]")
+            input()
     except KeyboardInterrupt:
         console.print("\n  [dim]Bye![/dim]")
         sys.exit(0)
-
-
-def _run_loop():
-    """main interaction loop"""
-    while True:
-        console.clear()
-        _header()
-
-        installed = _get_installed_environments()
-        if installed:
-            console.print("  [bold]Installed conda environments:[/bold]")
-            console.print()
-            for name in installed:
-                console.print(f"    {name}")
-        else:
-            console.print("  [dim]No conda environments found.[/dim]")
-        console.print()
-
-        choice = _menu(
-            ["Install additional environments", "Quit"],
-            "  What would you like to do?",
-        )
-
-        if choice != 0:
-            console.print()
-            console.print("  [dim]Bye![/dim]")
-            break
-
-        # fetch all environments once
-        console.print()
-        envs = _fetch_environments()
-        if not envs:
-            console.print("  [dim]No environments available. Press enter to continue...[/dim]")
-            input()
-            continue
-
-        installed_names = set(installed)
-
-        # drill-down: year -> semester -> courses
-        year = _pick_year(envs)
-        if year is None:
-            continue
-
-        semester = _pick_semester(envs, year)
-        if semester is None:
-            continue
-
-        selected = _pick_courses(envs, year, semester, installed_names)
-        if not selected:
-            console.print("\n  [dim]Nothing to install.[/dim]")
-            console.print("  [dim]Press enter to continue...[/dim]")
-            input()
-            continue
-
-        # confirm
-        console.print()
-        names = ", ".join(e.name for e in selected)
-        console.print(f"  Will install: [bold cyan]{names}[/bold cyan]")
-        if _menu(["Yes, install", "Cancel"], "  Proceed?") != 0:
-            continue
-
-        _install_selected(selected)
-        console.print("  [dim]Press enter to continue...[/dim]")
-        input()
