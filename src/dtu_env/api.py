@@ -29,7 +29,7 @@ class CourseEnvironment:
 
 def _load_environments_json() -> dict:
     """Load bundled environments.json."""
-    data_path = files("dtu_env.data").joinpath("environments.json")
+    data_path = files("dtu_env").joinpath("environments.json")
     return json.loads(data_path.read_text())
 
 

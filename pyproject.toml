@@ -62,4 +62,4 @@ exclude_commit_patterns = [
 ]
 
 [tool.uv.build-backend]
-source-include = ["src/dtu_env/data/**"]
+source-include = ["src/dtu_env/environments.json"]

@@ -31,17 +31,17 @@ jobs:
       - name: Check for changes
         id: check
         run: |
-          if git diff --quiet src/dtu_env/data/environments.json; then
+          if git diff --quiet src/dtu_env/environments.json; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Commit and push
         if: steps.check.outputs.changed == 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
-          git add src/dtu_env/data/environments.json
+          git add src/dtu_env/environments.json
           git commit -m "chore: update bundled environments [skip ci]"
           git push

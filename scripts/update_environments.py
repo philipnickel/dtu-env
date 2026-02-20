@@ -67,19 +67,12 @@ def main():
         "environments": environments,
     }
     
-    # Write to src/dtu_env/data/environments.json
-    data_dir = Path(__file__).parent.parent / "src" / "dtu_env" / "data"
-    data_dir.mkdir(parents=True, exist_ok=True)
-    
-    output_file = data_dir / "environments.json"
+    # Write to src/dtu_env/environments.json
+    output_file = Path(__file__).parent.parent / "src" / "dtu_env" / "environments.json"
     with open(output_file, "w") as f:
         json.dump(output, f, indent=2)
     
     print(f"\nWrote {len(environments)} environments to {output_file}")
-    
-    # Also create __init__.py for data package
-    init_file = data_dir / "__init__.py"
-    init_file.touch(exist_ok=True)
 
 
 if __name__ == "__main__":
